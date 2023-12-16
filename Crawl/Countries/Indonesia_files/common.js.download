@@ -1,0 +1,89 @@
+﻿$(function () { 
+    if ($("#modal-fullframe").length > 0) {
+        $('#modal-fullframe').on('hide.bs.modal', function (e) {
+            $('body').css({
+                overflow: '',
+                //	top: '',
+                height: '',
+                position: ''
+            });
+            if ($("body").attr('topcurrent')) {
+                $('html, body').animate({
+                    scrollTop: $("body").attr('topcurrent')
+                }, 0);
+                $("body").removeAttr('topcurrent');
+            }
+        })
+    }
+    $('#modal-fullsearch').on('hide.bs.modal', function (e) {
+        $('body').css({
+            overflow: '',
+            //top: '',
+            height: '',
+            position: ''
+        });
+        if ($("body").attr('topcurrent')) {
+            $('html, body').animate({
+                scrollTop: $("body").attr('topcurrent')
+            }, 0);
+            $("body").removeAttr('topcurrent');
+        }
+        //alert($("#searchTextFullFrame").val());
+        setTimeout(function () {
+            $(".typeahead.tt-input").each(function () {
+                $(this).val($("#searchTextFullFrame").val());
+            })
+        }, 500)
+        document.activeElement.blur();
+
+    })
+    $("#modal-fullsearch .input-icon-close").click(function () {
+        $("#searchTextFullFrame").val('');
+        $("#searchTextFullFrame").focus();
+    })
+    $(".search-fullframe").click(function (e) {
+        if (window.innerWidth < 768) {
+            $("#modal-fullsearch").modal("show");
+            var vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', vh + 'px');
+            var scrollPosition = $(window).scrollTop();
+            $("body").attr('topcurrent', scrollPosition);
+            $('body').css({
+                overflow: 'hidden',
+                //top: '0px',
+                height: '100%',
+                position: 'fixed'
+            });
+
+            $('html, body').animate({
+                scrollTop: $("#modal-fullsearch").offset().top
+            }, 200);
+            $("#searchTextFullFrame").trigger('keypress');
+            setTimeout(function () {
+                $("#searchTextFullFrame").val('');
+                $("#searchTextFullFrame").focus();
+            }, 750)
+        }
+    })
+});
+function handleLogging(name, content, status) {
+    var objRequest = {
+        content: content,
+        name: name,
+        type: "client",
+        status: status != undefined ? status : ""
+    };
+    var settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": "https://gate.ivivu.com/api/erp/Logging/write-json",
+        "method": "POST",
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "processData": false,
+        "data": JSON.stringify(objRequest)
+    }
+    $.ajax(settings).done(function (response) {
+    });
+}

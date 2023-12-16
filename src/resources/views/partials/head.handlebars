@@ -1,0 +1,70 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Tour guide</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="http://localhost:3000/">Home</a>
+        </li>
+        <li class="nav-item dropdown ">
+          <form id="countryForm" action="/country" method="GET">
+            <select class="nav-link dropdown-toggle" name="country" onchange="submitForm()">
+              <option value="">Quốc gia</option>
+              <option value="Trung Quốc">Trung Quốc</option>
+              <option value="Châu Âu">Châu Âu</option>
+              <option value="Đài Loan">Đài Loan</option>
+              <option value="Dubai">Dubai</option>
+              <option value="Hàn Quốc">Hàn Quốc</option>
+              <option value="Indonesia">Indonesia</option>
+              <option value="Nhật Bản">Nhật Bản</option>
+              <option value="Singapore">Singapore</option>
+              <option value="Thái Lan">Thái Lan</option>
+            </select>
+          </form>
+          <script>
+            function submitForm() {
+              document.getElementById('countryForm').submit();
+              var selectElement = document.getElementById('countryForm').elements['country'];
+    var selectedOption = selectElement.options[selectElement.selectedIndex];
+    
+    // Xóa thuộc tính "selected" của tất cả các option
+    for (var i = 0; i < selectElement.options.length; i++) {
+      selectElement.options[i].removeAttribute('selected');
+    }
+
+    // Gán thuộc tính "selected" cho option được chọn
+    selectedOption.setAttribute('selected', 'selected');
+            }
+          </script>
+        </li>
+        <li class="nav-item dropdown">
+          <form id="transportForm" action="/transport" method="GET">
+            <select class="nav-link dropdown-toggle" name="transport" onchange="submit()">
+              <option value="">Phương tiện</option>
+              <option value="Máy bay">Máy bay</option>
+              <option value="Ô tô">Ô tô</option>
+              <option value="Tàu cao tốc">Tàu cao tốc</option>
+              <option value="Du thuyền">Du thuyền</option>
+              <option value="Cano">Cano</option>
+              <option value="Tàu thủy">Tàu thủy</option>
+            </select>
+          </form>
+          <script>
+            function submit() {
+              document.getElementById('transportForm').submit();
+            }
+          </script>
+        </li>
+      </ul>
+      {{!-- Search title --}}
+      <form class="d-flex" action="/search" method="GET">
+        <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>

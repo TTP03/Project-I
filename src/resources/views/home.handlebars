@@ -1,0 +1,37 @@
+<div class="mt-4">
+    <div class="row">
+        {{#each data}}
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-tour-item" style="width: 18rem;">
+                <img class="card-img-top" src='{{this.[3]}}' alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">{{this.[1]}}</h5>
+                    <p class="Tour-name">{{this.[2]}}</p>
+                    <span class="score-container__inner v-margin-top-5">
+                        <script>
+                            var value = {{ this.[7]}};
+                            var formattedValue = Number.isInteger(value) ? value + ".0" : value;
+                            document.write('<span class="score">' + formattedValue + '</span>');
+                        </script>
+                        <span class="score-description">Tuyệt vời </span>
+                    </span>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 v-margin-bottom-5 ">
+                        <br>
+                        <br>
+                        <ul class="trans">
+                            <li>{{this.[4]}} Ngày</li>
+                            <li>{{this.[6]}}</li>
+                        </ul>
+                    </div>
+                    <script>
+                        var originalPrice = {{ this.[5] }};
+                        var formattedPrice = new Intl.NumberFormat('vi-VN').format(originalPrice);
+                        document.write('<span class="price">' + formattedPrice + '<small class="textCurrency"> VND</small></span>');
+                    </script>
+                    <a href="#" class="btn btn-primary">Đặt tour</a>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>
