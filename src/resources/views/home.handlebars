@@ -28,10 +28,19 @@
                         var formattedPrice = new Intl.NumberFormat('vi-VN').format(originalPrice);
                         document.write('<span class="price">' + formattedPrice + '<small class="textCurrency"> VND</small></span>');
                     </script>
-                    <a href="#" class="btn btn-primary">Đặt tour</a>
+                    <button class="btn btn-primary" onclick="showAlert()">Đặt tour</button>
                 </div>
             </div>
         </div>
         {{/each}}
     </div>
 </div>
+
+<script>
+    function showAlert() {
+        var userResponse = confirm('Bạn có chắc chắn muốn đặt tour không?');
+        if (userResponse) {
+            alert('Đặt tour thành công');
+        }
+    }
+</script>
