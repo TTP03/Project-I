@@ -1,8 +1,38 @@
 <div class="mt-4">
+    <div class="mb-3">
+        <div class="row justify-content-center">
+            <div class="col-md-auto">
+                <select class="form-select" id="titleFilter" onchange="filterItems()">
+                    <option value="all">Quốc gia</option>
+                    <option value="Trung Quốc">Trung Quốc</option>
+                    <option value="Châu Âu">Châu Âu</option>
+                    <option value="Đài Loan">Đài Loan</option>
+                    <option value="Dubai">Dubai</option>
+                    <option value="Hàn Quốc">Hàn Quốc</option>
+                    <option value="Indonesia">Indonesia</option>
+                    <option value="Nhật Bản">Nhật Bản</option>
+                    <option value="Singapore">Singapore</option>
+                    <option value="Thái Lan">Thái Lan</option>
+                </select>
+            </div>
+            <div class="col-md-auto">
+                <select class="form-select" id="vehicleFilter" onchange="filterItems()">
+                    <option value="all">Phương tiện</option>
+                    <option value="Máy bay">Máy bay</option>
+                    <option value="Ô tô">Ô tô</option>
+                    <option value="Tàu cao tốc">Tàu cao tốc</option>
+                    <option value="Du thuyền">Du thuyền</option>
+                    <option value="Cano">Cano</option>
+                    <option value="Tàu thủy">Tàu thủy</option>
+                </select>
+            </div>
+            <div class="col-md-9"></div>
+        </div>
+    </div>
     <div class="row">
         {{#each data}}
-        <div class="col-sm-6 col-lg-3">
-            <div class="card card-tour-item" style="width: 18rem;">
+        <div class="col-sm-6 col-lg-3" data-title="{{this.[1]}}" data-vehicle="{{this.[6]}}">
+            <div class="card card-tour-item" style="width: 18rem">
                 <img class="card-img-top" src='{{this.[3]}}' alt="Card image cap">
                 <div class="card-body">
                     <h5 class="card-title">{{this.[1]}}</h5>
@@ -20,7 +50,7 @@
                         <br>
                         <ul class="trans">
                             <li>{{this.[4]}} Ngày</li>
-                            <li>{{this.[6]}}</li>
+                            <li class="card-vehicle">{{this.[6]}}</li>
                         </ul>
                     </div>
                     <script>
@@ -28,7 +58,7 @@
                         var formattedPrice = new Intl.NumberFormat('vi-VN').format(originalPrice);
                         document.write('<span class="price">' + formattedPrice + '<small class="textCurrency"> VND</small></span>');
                     </script>
-                    <button class="btn btn-primary" onclick="showAlert()">Đặt tour</button>
+                    <button class="btn btn-primary" onclick="showBookingModal()">Đặt tour</button>
                 </div>
             </div>
         </div>
@@ -36,11 +66,67 @@
     </div>
 </div>
 
+<div class="modal fade" id="booking" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">XÁC NHẬN</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn muốn đặt chuyến du lịch này?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-book" type="button" class="btn btn-danger" data-bs-dismiss="modal">Đồng ý</button>
+                <button type="button" class="btn btn-secondary" id="btn-cancel" data-bs-dismiss="modal">Huỷ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="booked" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">THÔNG BÁO</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn đã đặt chuyến du lịch thành công!</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-ok" type="button" class="btn btn-danger" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
-    function showAlert() {
-        var userResponse = confirm('Bạn có chắc chắn muốn đặt tour không?');
-        if (userResponse) {
-            alert('Đặt tour thành công');
-        }
+
+    function showBookingModal() {
+        var bookingModal = new bootstrap.Modal(document.getElementById('booking'));
+        bookingModal.show();
+    }
+
+    document.getElementById('btn-book').addEventListener('click', function () {
+        var bookedModal = new bootstrap.Modal(document.getElementById('booked'));
+        bookedModal.show();
+    });
+    function filterItems() {
+        var selectedTitle = document.getElementById('titleFilter').value;
+        var selectedVehicle = document.getElementById('vehicleFilter').value;
+
+        var items = document.querySelectorAll('.col-sm-6.col-lg-3');
+
+        items.forEach(function (item) {
+            var title = item.getAttribute('data-title').toLowerCase();
+            var vehicle = item.getAttribute('data-vehicle').toLowerCase();
+
+            if ((selectedTitle === 'all' || title.includes(selectedTitle.toLowerCase())) &&
+                (selectedVehicle === 'all' || vehicle.includes(selectedVehicle.toLowerCase()))) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
     }
 </script>

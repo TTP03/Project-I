@@ -40,3 +40,6 @@ h1 {
 .trans {
   color: #00abc5;
 }
+.card-tour-item {
+  height: 95%; 
+}

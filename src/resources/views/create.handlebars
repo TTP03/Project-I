@@ -1,0 +1,41 @@
+<div class="mt-4">
+    <form action="/create" method="POST" id="createForm">
+
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1">#</span>
+            <input type="text" class="form-control" placeholder="CODE" aria-describedby="basic-addon1" name="newCode" required>
+        </div>
+
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Quốc gia" aria-describedby="basic-addon2" name="newCountry" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="basic-url" class="form-label">URL ảnh</label>
+            <div class="input-group">
+                <span class="input-group-text" id="basic-addon3">https:</span>
+                <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4" name="newURL" required>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <span class="input-group-text">Nội dung tour</span>
+            <textarea class="form-control" aria-label="With textarea" name="newTitle"></textarea>
+        </div>
+        <br>
+
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Giá tour" required>
+            <span class="input-group-text" name="newPrice">VND</span>
+            <input type="text" class="form-control" placeholder="Thời lượng" required>
+            <span class="input-group-text" name="newTime">Ngày</span>
+        </div>
+
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Phương tiện di chuyển" required>
+        </div>
+
+        <button class="btn btn-outline-success" type="submit">Tạo</button>
+
+    </form>
+</div>
