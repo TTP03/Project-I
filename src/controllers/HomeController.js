@@ -50,15 +50,21 @@ const homeController = {
   },
 
   getHint (req, res) {
-    const budget = req.query.budget;
+    const budget = req.query.budget*1000000;
     const timeFund = req.query.timeFund;
+    const budgetWeight = req.query.budgetWeight;
+    const timeFundWeight = req.query.timeFundWeight;
+    const ratingWeight = req.query.ratingWeight;
     sql.open(connectionString, (err, conn) => {
       if (err) {
         console.error('Error opening connection to SQL Server', err);
         res.status(500).send('Internal Server Error');
         return;
       } 
-      const query = "SELECT * FROM TOUR WHERE TOUR.PRICE <= ? AND TOUR.TIME <= ?";
+      var query = "SELECT * FROM TOUR WHERE TOUR.PRICE <= ? AND TOUR.TIME <= ?"
+      if (!timeFund && !budget) query = "SELECT * FROM TOUR";
+      else if (!timeFund) query = "SELECT * FROM TOUR WHERE TOUR.PRICE <= ?";
+      else if (!budget) query = "SELECT * FROM TOUR WHERE ?=0 AND TOUR.TIME <= ?";
       conn.queryRaw(query, [budget, timeFund], (err, results) => {
         if (err) {
           console.error('Error executing query', err);
@@ -70,8 +76,10 @@ const homeController = {
         // TOPSIS Method
         const price = [], time = [], rating = [], hintMatrix = [], positiveMatrix = [], negativeMatrix = [], similarity = [];
         for (let i = 0; i < data.length; i++) {
-          time.push(data[i][4]);
-          price.push(data[i][5]);
+          if (!timeFund) time.push(1);
+          else time.push(data[i][4]);
+          if (!budget) price.push(1);
+          else price.push(data[i][5]);
           rating.push(data[i][7]);
         }
 
@@ -90,9 +98,9 @@ const homeController = {
         
         // chưa thêm hệ số
         for (let i = 0; i < hintMatrix[0].length; i++){
-          hintMatrix[0][i] = hintMatrix[0][i] / Math.sqrt(SvTime);
-          hintMatrix[1][i] = hintMatrix[1][i] / Math.sqrt(SvPrice);
-          hintMatrix[2][i] = hintMatrix[2][i] / Math.sqrt(SvRating);
+          hintMatrix[0][i] = hintMatrix[0][i] / Math.sqrt(SvTime) * timeFundWeight;
+          hintMatrix[1][i] = hintMatrix[1][i] / Math.sqrt(SvPrice) * budgetWeight;
+          hintMatrix[2][i] = hintMatrix[2][i] / Math.sqrt(SvRating) * ratingWeight;
         }
 
         positiveMatrix.push(Math.max.apply(null, hintMatrix[0]));

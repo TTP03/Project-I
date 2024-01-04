@@ -1,0 +1,89 @@
+<div class="mt-4">
+    <h2>Thống kê các tour</h2>
+    <div class="mb-3">
+        <label for="apartmentCodeFilter" class="form-label">Mã tour</label>
+        <input type="text" class="form-control" id="apartmentCodeFilter">
+    </div>
+
+    <div class="mb-3">
+        <label for="feeNameFilter" class="form-label">Tên tour</label>
+        <input type="text" class="form-control" id="feeNameFilter">
+    </div>
+    <table class="table mt-2">
+        <thead class="table-active">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Mã tour</th>
+                <th scope="col">Quốc gia</th>
+                <th scope="col">Giá tour</th>
+                <th scope="col">Số lượng đặt</th>
+                <th scope="col">Đánh giá</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            {{#each data}}
+            <tr>
+                <th scope="row">{{sum @index 1}}</th>
+                <td>{{this.[0]}}</td>
+                <td>{{this.[1]}}</td>
+                <td>{{this.[5]}}</td>
+                <td>thiếu</td>
+                <td>{{this.[7]}}</td>
+            <td>
+                    <a href="/fee/{{this._id}}/edit" class="btn btn-warning">Chỉnh sửa</a>
+                    <a class="btn btn-danger" data-bs-toggle="modal" data-id="{{this._id}}"
+                        data-bs-target="#delete-fee">Xoá</a>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="9" class="text-center">
+                    You have nothing left!
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Get input and select elements
+        var apartmentCodeFilter = document.getElementById("apartmentCodeFilter");
+        var feeNameFilter = document.getElementById("feeNameFilter");
+        var statusFilter = document.getElementById("statusFilter");
+
+        // Get table rows
+        var rows = document.querySelectorAll("tbody tr");
+
+        // Add event listeners to input fields and select element
+        apartmentCodeFilter.addEventListener("input", filterTable);
+        feeNameFilter.addEventListener("input", filterTable);
+        statusFilter.addEventListener("change", filterTable);
+
+        function filterTable() {
+            var apartmentCodeValue = apartmentCodeFilter.value.toLowerCase();
+            var feeNameValue = feeNameFilter.value.toLowerCase();
+            var statusValue = statusFilter.value;
+
+            // Loop through each row and hide/show based on filter criteria
+            rows.forEach(function (row) {
+                var apartmentCode = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+                var feeName = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+                var status = row.querySelector("td:nth-child(9)").textContent; // Assuming status is in the 9th column
+
+                var apartmentCodeMatch = apartmentCode.includes(apartmentCodeValue);
+                var feeNameMatch = feeName.includes(feeNameValue);
+                var statusMatch = (statusValue === "" || status === statusValue);
+
+                if (apartmentCodeMatch && feeNameMatch && statusMatch) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+    });
+</script>

@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const exphbs = require('express-handlebars');
+const hbs = require('express-handlebars');
 const morgan = require('morgan');
 const port = 3000;
 const app = express();
@@ -15,10 +15,17 @@ app.use(express.json());
 
 route(app);
 // Template handlebars
-const hbs = exphbs.create();
-app.engine('handlebars', hbs.engine);
-
-app.set('view engine', 'handlebars');
+app.engine(
+    'hbs',
+    hbs.engine({
+        extname: '.hbs',
+        helpers: {
+            sum: (a, b) => a + b,
+            mul: (a, b) => a * b,
+        },
+    }),
+);
+app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'resources/views'));
 
 

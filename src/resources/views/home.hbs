@@ -1,6 +1,15 @@
 <div class="mt-4">
     <div class="mb-3">
         <div class="row justify-content-center">
+            
+            <div class="col-md-auto">
+                <select class="form-select" id="priceSort" onchange="sortItems()">
+                    <option value="default">Sắp xếp theo</option>
+                    <option value="asc">Giá tăng dần</option>
+                    <option value="desc">Giá giảm dần</option>
+                </select>
+            </div>
+
             <div class="col-md-auto">
                 <select class="form-select" id="titleFilter" onchange="filterItems()">
                     <option value="all">Quốc gia</option>
@@ -26,12 +35,16 @@
                     <option value="Tàu thủy">Tàu thủy</option>
                 </select>
             </div>
-            <div class="col-md-9"></div>
+
+            <div class="col-md-auto">
+                <button type="button" class="btn btn-secondary" onclick="hintModal()">Gợi ý tour</button>
+            </div>
+            <div class="col-md-6"></div>
         </div>
     </div>
-    <div class="row">
+    <div class="row del">
         {{#each data}}
-        <div class="col-sm-6 col-lg-3" data-title="{{this.[1]}}" data-vehicle="{{this.[6]}}">
+        <div class="col-sm-6 col-lg-3" data-title="{{this.[1]}}" data-vehicle="{{this.[6]}}" data-price="{{this.[5]}}">
             <div class="card card-tour-item" style="width: 18rem">
                 <img class="card-img-top" src='{{this.[3]}}' alt="Card image cap">
                 <div class="card-body">
@@ -100,7 +113,54 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="hint" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">NHẬP DỮ LIỆU CÁC TIÊU CHÍ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="hintForm" action="/hint" method="GET">
+                    <div class="input-group mb-3">
+                        <input class="form-control" type="text" name="budget" placeholder="Ngân sách">
+                        <span class="input-group-text" name="newPrice">x1,000,000 VND</span>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <input class="form-control" type="text" name="timeFund" placeholder="Quỹ thời gian">
+                        <span class="input-group-text" name="newPrice">Ngày</span>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input class="form-control" type="text" name="Rating" value="Điểm đánh giá: MAX" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <label>Trọng số các tiêu chí</label>
+                    </div>
+                    <div id="rangeSlider"></div>
+                    <div hidden>
+                        <input class="form-control" type="text" name="budgetWeight">
+                        <input class="form-control" type="text" name="timeFundWeight">
+                        <input class="form-control" type="text" name="ratingWeight">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-hint" type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                    onclick="submit()">Xác nhận</button>
+                <button type="button" class="btn btn-secondary" id="btn-cancel" data-bs-dismiss="modal">Huỷ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+
+    function hintModal() {
+        var hintModal = new bootstrap.Modal(document.getElementById('hint'));
+        hintModal.show();
+    }
 
     function showBookingModal() {
         var bookingModal = new bootstrap.Modal(document.getElementById('booking'));
@@ -127,6 +187,61 @@
             } else {
                 item.style.display = 'none';
             }
+        });
+    }
+    function submit() {
+        var form = document.getElementById("hintForm");
+        form.submit();
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        var rangeSlider = document.getElementById('rangeSlider');
+
+        noUiSlider.create(rangeSlider, {
+            start: [0.3, 0.7],
+            connect: [true, true, true],
+            range: {
+                'min': 0,
+                'max': 1
+            }
+        });
+
+        rangeSlider.noUiSlider.on('update', function (values, handle) {
+            updateRanges(values);
+        });
+    });
+
+    function updateRanges(values) {
+        // Update your form inputs or perform actions based on the slider values
+        var budgetInput = document.querySelector('input[name="budgetWeight"]');
+        var timeFundInput = document.querySelector('input[name="timeFundWeight"]');
+        var ratingInput = document.querySelector('input[name="ratingWeight"]')
+
+        budgetInput.value = values[0];
+        timeFundInput.value = values[1] - values[0];
+        ratingInput.value = 1 - values[1];
+    }
+    function sortItems() {
+        var selectedSortOption = document.getElementById('priceSort').value;
+
+        var items = document.querySelectorAll('.col-sm-6.col-lg-3');
+
+        var sortedItems = Array.from(items).sort(function (a, b) {
+            var priceA = parseFloat(a.getAttribute('data-price'));
+            var priceB = parseFloat(b.getAttribute('data-price'));
+            if (selectedSortOption === 'asc') {
+                return priceA - priceB;
+            } else if (selectedSortOption === 'desc') {
+                return priceB - priceA;
+            } else {
+                return 0;
+            }
+        });
+
+        var container = document.querySelector('.del');
+        container.innerHTML = '';
+
+        sortedItems.forEach(function (item) {
+            container.appendChild(item);
         });
     }
 </script>

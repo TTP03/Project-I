@@ -43,3 +43,8 @@ h1 {
 .card-tour-item {
   height: 95%; 
 }
+.ellipsis-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
