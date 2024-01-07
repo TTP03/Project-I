@@ -80,7 +80,7 @@ const homeController = {
           else time.push(data[i][4]);
           if (!budget) price.push(1);
           else price.push(data[i][5]);
-          rating.push(data[i][7]);
+          rating.push(data[i][8]);
         }
 
         hintMatrix.push(time);
@@ -143,9 +143,74 @@ const homeController = {
       });
     });
   },
+  
+  booking (req, res) {
+    sql.open(connectionString, (err, conn) => {
+        if (err) {
+          console.error('Error opening connection to SQL Server', err);
+          res.status(500).send('Internal Server Error1');
+          return;
+        }
+        const id = req.query.id;
+        const code = req.query.code;
+        const name = req.query.name;
+        const phone = req.query.phone;
+        const quantity = req.query.quantity;
+        var countID, countCodeID;
 
-  createTour (req, res) {
-    res.render('create')
+        const clientQuery_check = 'SELECT COUNT(*) FROM CLIENT WHERE ID = ?';
+        const bookedQuery_check = 'SELECT COUNT(*) FROM BOOKED WHERE CODE = ? AND ID = ?';
+        
+        var tourQuery = 'UPDATE TOUR SET TOUR.QUANTITY = (SELECT SUM(BOOKED.QUANTITY) FROM BOOKED WHERE BOOKED.CODE = TOUR.CODE) WHERE EXISTS (SELECT 1 FROM BOOKED WHERE BOOKED.CODE = TOUR.CODE)';
+        var clientQuery = 'INSERT INTO CLIENT (NAME, PHONE_NUMBER, ID) VALUES (?, ?, ?)';
+        var bookedQuery = 'INSERT INTO BOOKED (QUANTITY, ID, CODE) VALUES(?, ?, ?) ';
+
+        conn.queryRaw(clientQuery_check, [id], (err, results1) => {
+            if (err) {
+              console.error('Error executing query', err);
+              res.status(500).send('Internal Server Error2');
+              return;
+            }
+            countID = results1.rows;    
+            conn.queryRaw(bookedQuery_check, [code, id], (err, results2) => {
+              if (err) {
+                console.error('Error executing query', err);
+                res.status(500).send('Internal Server Error3');
+                return;
+              }
+              countCodeID = results2.rows;
+              if (countID[0][0] > 0) {
+                clientQuery = 'UPDATE CLIENT SET NAME = ?, PHONE_NUMBER = ? WHERE ID = ?';
+                if (countCodeID[0][0] > 0) {
+                    bookedQuery = 'UPDATE BOOKED SET QUANTITY = QUANTITY + ? WHERE  ID = ? AND CODE = ? ';
+                }
+              }
+              conn.queryRaw(clientQuery, [name, phone, id], (err) => {
+                if (err) {
+                  console.error('Error executing query', err);
+                  res.status(500).send('Internal Server Error4');
+                  return;
+                }
+            });
+    
+            conn.queryRaw(bookedQuery, [quantity, id, code], (err) => {
+                if (err) {
+                  console.error('Error executing query', err);
+                  res.status(500).send('Internal Server Error5');
+                  return;
+                }
+                conn.queryRaw(tourQuery, (err, results) => {
+                    if (err) {
+                      console.error('Error executing query', err);
+                      res.status(500).send('Internal Server Error6');
+                      return;
+                    }
+                    res.redirect('back');
+                });
+            });
+          });
+        });
+    });
   },
 };
 

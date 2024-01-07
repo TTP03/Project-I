@@ -1,89 +1,161 @@
 <div class="mt-4">
-    <h2>Thống kê các tour</h2>
     <div class="mb-3">
-        <label for="apartmentCodeFilter" class="form-label">Mã tour</label>
-        <input type="text" class="form-control" id="apartmentCodeFilter">
-    </div>
+        <div class="row justify-content-left">
+            <div class="col-md-auto">
+            <button type="button" class="btn btn-light"><a href="/management/create">
+            <i class="bi bi-plus-circle-dotted"></i>
+            Tạo thêm tour
+        </a></button>
+        </div>
+            <div class="col-md-auto">
+                <select class="form-select" id="priceSort" onchange="sortItems()">
+                    <option value="default">Sắp xếp theo</option>
+                    <option value="asc">Giá tăng dần</option>
+                    <option value="desc">Giá giảm dần</option>
+                </select>
+            </div>
 
-    <div class="mb-3">
-        <label for="feeNameFilter" class="form-label">Tên tour</label>
-        <input type="text" class="form-control" id="feeNameFilter">
+            <div class="col-md-auto">
+                <select class="form-select" id="countryFilter" onchange="filterItems()">
+                    <option value="all">Quốc gia</option>
+                    <option value="Trung Quốc">Trung Quốc</option>
+                    <option value="Châu Âu">Châu Âu</option>
+                    <option value="Đài Loan">Đài Loan</option>
+                    <option value="Dubai">Dubai</option>
+                    <option value="Hàn Quốc">Hàn Quốc</option>
+                    <option value="Indonesia">Indonesia</option>
+                    <option value="Nhật Bản">Nhật Bản</option>
+                    <option value="Singapore">Singapore</option>
+                    <option value="Thái Lan">Thái Lan</option>
+                </select>
+            </div>
+            <div class="col-md-auto">
+                <select class="form-select" id="vehicleFilter" onchange="filterItems()">
+                    <option value="all">Phương tiện</option>
+                    <option value="Máy bay">Máy bay</option>
+                    <option value="Ô tô">Ô tô</option>
+                    <option value="Tàu cao tốc">Tàu cao tốc</option>
+                    <option value="Du thuyền">Du thuyền</option>
+                    <option value="Cano">Cano</option>
+                    <option value="Tàu thủy">Tàu thủy</option>
+                </select>
+            </div>
+            <div class="col-md-auto">
+                <input type="text" class="form-control" id="titleFilter" placeholder="Tìm kiếm tour">
+            </div>
+        </div>
     </div>
-    <table class="table mt-2">
-        <thead class="table-active">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Mã tour</th>
-                <th scope="col">Quốc gia</th>
-                <th scope="col">Giá tour</th>
-                <th scope="col">Số lượng đặt</th>
-                <th scope="col">Đánh giá</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody class="table-group-divider">
-            {{#each data}}
-            <tr>
-                <th scope="row">{{sum @index 1}}</th>
-                <td>{{this.[0]}}</td>
-                <td>{{this.[1]}}</td>
-                <td>{{this.[5]}}</td>
-                <td>thiếu</td>
-                <td>{{this.[7]}}</td>
-            <td>
-                    <a href="/fee/{{this._id}}/edit" class="btn btn-warning">Chỉnh sửa</a>
-                    <a class="btn btn-danger" data-bs-toggle="modal" data-id="{{this._id}}"
-                        data-bs-target="#delete-fee">Xoá</a>
-                </td>
-            </tr>
-            {{else}}
-            <tr>
-                <td colspan="9" class="text-center">
-                    You have nothing left!
-                </td>
-            </tr>
-            {{/each}}
-        </tbody>
-    </table>
+    <div class="row del">
+        {{#each data}}
+        <div class="col-sm-6 col-lg-3" data-country="{{this.[1]}}" data-vehicle="{{this.[6]}}" data-price="{{this.[5]}}" data-title="{{this.[2]}}">
+            <div class="card card-tour-item" style="width: 18rem">
+                <img class="card-img-top" src='{{this.[3]}}' alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">{{this.[1]}}</h5>
+                    <p class="Tour-name">{{this.[2]}}</p>
+                    <span class="score-container__inner v-margin-top-5">
+                        <script>
+                            var value = {{ this.[8]}};
+                            var formattedValue = Number.isInteger(value) ? value + ".0" : value;
+                            document.write('<span class="score">' + formattedValue + '</span>');
+                        </script>
+                        <span class="score-description">Tuyệt vời </span>
+                    </span>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 v-margin-bottom-5 ">
+                        <br>
+                        <br>
+                        <ul class="trans">
+                            <li>{{this.[4]}} Ngày</li>
+                            <li class="card-vehicle">{{this.[6]}}</li>
+                        </ul>
+                    </div>
+                    {{#if (isZero this.[5])}}
+                    <span class="price">Hết chỗ<small class="textCurrency"></small></span>
+                    {{else}}
+                    <span class="price">{{numberFormat this.[5]}}<small class="textCurrency"> VND</small></span>
+                    {{/if}}
+                    <a href="/management/{{this.[0]}}/edit" class="btn btn-warning">Chỉnh sửa</a>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    var titleFilter = document.getElementById('titleFilter');
+    titleFilter.addEventListener("input", filterItems);
 
-        // Get input and select elements
-        var apartmentCodeFilter = document.getElementById("apartmentCodeFilter");
-        var feeNameFilter = document.getElementById("feeNameFilter");
-        var statusFilter = document.getElementById("statusFilter");
+    function filterItems() {
+        var selectedCountry = document.getElementById('countryFilter').value;
+        var selectedVehicle = document.getElementById('vehicleFilter').value;
+        var titleFilter = document.getElementById('titleFilter');
+        
+        var items = document.querySelectorAll('.col-sm-6.col-lg-3');
+        items.forEach(function (item) {
+            var country = item.getAttribute('data-country').toLowerCase();
+            var vehicle = item.getAttribute('data-vehicle').toLowerCase();
+            var title = titleFilter.value.toLowerCase();
 
-        // Get table rows
-        var rows = document.querySelectorAll("tbody tr");
+            if ((selectedCountry === 'all' || country.includes(selectedCountry.toLowerCase())) &&
+                (selectedVehicle === 'all' || vehicle.includes(selectedVehicle.toLowerCase())) &&
+                (title === '' || item.getAttribute('data-title').toLowerCase().includes(title))) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        var rangeSlider = document.getElementById('rangeSlider');
 
-        // Add event listeners to input fields and select element
-        apartmentCodeFilter.addEventListener("input", filterTable);
-        feeNameFilter.addEventListener("input", filterTable);
-        statusFilter.addEventListener("change", filterTable);
+        noUiSlider.create(rangeSlider, {
+            start: [0.3, 0.7],
+            connect: [true, true, true],
+            range: {
+                'min': 0,
+                'max': 1
+            }
+        });
 
-        function filterTable() {
-            var apartmentCodeValue = apartmentCodeFilter.value.toLowerCase();
-            var feeNameValue = feeNameFilter.value.toLowerCase();
-            var statusValue = statusFilter.value;
-
-            // Loop through each row and hide/show based on filter criteria
-            rows.forEach(function (row) {
-                var apartmentCode = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
-                var feeName = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
-                var status = row.querySelector("td:nth-child(9)").textContent; // Assuming status is in the 9th column
-
-                var apartmentCodeMatch = apartmentCode.includes(apartmentCodeValue);
-                var feeNameMatch = feeName.includes(feeNameValue);
-                var statusMatch = (statusValue === "" || status === statusValue);
-
-                if (apartmentCodeMatch && feeNameMatch && statusMatch) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-        }
+        rangeSlider.noUiSlider.on('update', function (values, handle) {
+            updateRanges(values);
+        });
     });
+
+    function updateRanges(values) {
+        // Update your form inputs or perform actions based on the slider values
+        var budgetInput = document.querySelector('input[name="budgetWeight"]');
+        var timeFundInput = document.querySelector('input[name="timeFundWeight"]');
+        var ratingInput = document.querySelector('input[name="ratingWeight"]')
+
+        budgetInput.value = values[0];
+        timeFundInput.value = values[1] - values[0];
+        ratingInput.value = 1 - values[1];
+    }
+    function sortItems() {
+        var selectedSortOption = document.getElementById('priceSort').value;
+
+        var items = document.querySelectorAll('.col-sm-6.col-lg-3');
+
+        var sortedItems = Array.from(items).sort(function (a, b) {
+            var priceA = parseFloat(a.getAttribute('data-price'));
+            var priceB = parseFloat(b.getAttribute('data-price'));
+            if (selectedSortOption === 'asc') {
+                return priceA - priceB;
+            } else if (selectedSortOption === 'desc') {
+                return priceB - priceA;
+            } else {
+                return 0;
+            }
+        });
+
+        var container = document.querySelector('.del');
+        container.innerHTML = '';
+
+        sortedItems.forEach(function (item) {
+            container.appendChild(item);
+        });
+    }
 </script>

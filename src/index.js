@@ -22,6 +22,27 @@ app.engine(
         helpers: {
             sum: (a, b) => a + b,
             mul: (a, b) => a * b,
+            numberFormat : (a) => {
+                return Intl.NumberFormat('vi-VN').format(a);
+            },
+            roundToDecimal: (value, decimalPlaces) => {
+                if (typeof value === 'number' && typeof decimalPlaces === 'number') {
+                    const multiplier = 10 ** decimalPlaces;
+                    const roundedValue = Math.round(value * multiplier) / multiplier;
+                    return new Handlebars.SafeString(roundedValue.toFixed(decimalPlaces));
+                } else {
+                    return value;
+                }
+            },
+            division : (a, b) => a/b,
+            isZero : (a) => {
+                if (a > 0) return false;
+                else return true;
+            },
+            isEqual : (a, b) => {
+                if (a === b) return true;
+                else false;
+            }
         },
     }),
 );

@@ -1,0 +1,159 @@
+<div class="mt-4">
+    <h2>Thông tin khách hàng</h2>
+    <div class="mb-3">
+        <div class="row justify-content">
+            <div class="col-md-auto">
+                <label for="totalTour" class="form-label">Tổng số khách hàng</label>
+                <input type="text" class="form-control" id="totalTour" value="{{clientNumber}} Khách" readonly>
+            </div>
+            <div class="col-md-10">
+            </div>
+            <br>
+            <div class="col-md-auto">
+                <label for="clientIDFilter" class="form-label">Tìm kiếm ID</label>
+                <input type="text" class="form-control" id="clientIDFilter">
+            </div>
+            <div class="col-md-auto">
+                <label for="nameFilter" class="form-label">Tìm kiếm tên</label>
+                <input type="text" class="form-control" id="nameFilter">
+            </div>
+            <div class="col-md-auto">
+                <label for="sđtFilter" class="form-label">Tìm kiếm SĐT</label>
+                <input type="text" class="form-control" id="sđtFilter">
+            </div>
+            <div class="col-md-auto">
+                <label for="sortFilter" class="form-label">Sắp xếp theo</label>
+                <select class="form-select" id="sortFilter" onchange="sortTable()">
+                    <option value="default">Mặc định</option>
+                    <option value="amount_asc">Tổng tiền tăng dần</option>
+                    <option value="amount_desc">Tổng tiền giảm dần</option>
+                    <option value="quantity_asc">Số lượng tăng dần</option>
+                    <option value="quantity_desc">Số lượng giảm dần</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <table class="table mt-2">
+        <thead class="table-active">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">ID</th>
+                <th scope="col">Họ và tên</th>
+                <th scope="col">Số điện thoại</th>
+                <th scope="col">Số lượng đã đặt</th>
+                <th scope="col">Tổng số tiền</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            {{#each client}}
+            <tr>
+                <th scope="row">{{sum @index 1}}</th>
+                <td>{{this.[0]}}</td>
+                <td>{{this.[1]}}</td>
+                <td>{{this.[2]}}</td>
+                {{#each ../booked}}
+                    {{#if (isEqual this.[0] ../this.[0])}}
+                    <td>{{this.[1]}} lượt</td>        
+                    <td>{{numberFormat this.[2]}} VNĐ</td>
+                    {{/if}}
+                {{/each}}
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="9" class="text-center">
+                    You have nothing left!
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Get input and select elements
+        var clientIDFilter = document.getElementById("clientIDFilter");
+        var nameFilter = document.getElementById("nameFilter");
+        var sđtFilter =document.getElementById("sđtFilter");
+        var sortFilter = document.getElementById("sortFilter");
+        // Get table rows
+        var rows = document.querySelectorAll("tbody tr");
+
+        // Add event listeners to input fields and select element
+        clientIDFilter.addEventListener("input", filterTable);
+        nameFilter.addEventListener("input", filterTable);
+        sđtFilter.addEventListener("input", filterTable);
+        sortFilter.addEventListener("change", sortTable);
+
+        function filterTable() {
+            var IDValue = clientIDFilter.value.toLowerCase();
+            var nameValue = nameFilter.value.toLowerCase();
+            var sđtValue = sđtFilter.value.toLowerCase();
+
+            // Loop through each row and hide/show based on filter criteria
+            rows.forEach(function (row) {
+                var ID = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+                var name = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+                var sđt = row.querySelector("td:nth-child(4)").textContent.toLowerCase();
+
+                var IDMatch = ID.includes(IDValue);
+                var nameMatch = name.includes(nameValue);
+                var sđtMatch = sđt.includes(sđtValue);
+
+                if (IDMatch && nameMatch && sđtMatch) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+        function sortTable() {
+            var sortBy = sortFilter.value;
+
+            // Convert rows to an array for sorting
+            var rowsArray = Array.from(rows);
+
+            if (sortBy.includes('amount')) {
+                rowsArray.sort(function (a, b) {
+                    var aValue = parseFloat(a.querySelector(`td:nth-child(5)`).textContent);
+                    var bValue = parseFloat(b.querySelector(`td:nth-child(5)`).textContent);
+
+                    if (sortBy.includes('asc')) {
+                        return aValue - bValue;
+                    } else if (sortBy.includes('desc')) {
+                        return bValue - aValue;
+                    }
+                });
+            }
+            else if (sortBy.includes('quantity')) {
+                rowsArray.sort(function (a, b) {
+                    var aValue = parseFloat(a.querySelector(`td:nth-child(6)`).textContent.replace(' VNĐ', '').replace('.',''));
+                    var bValue = parseFloat(b.querySelector(`td:nth-child(6)`).textContent.replace(' VNĐ', '').replace('.',''));
+                    if (sortBy.includes('asc')) {
+                        return aValue - bValue;
+                    } else if (sortBy.includes('desc')) {
+                        return bValue - aValue;
+                    }
+                });
+            }
+            else if (sortBy == 'default') {
+                rowsArray.sort(function (a, b) {
+                return 0;
+            });
+            }
+
+            // Clear the table body
+            rows.forEach(function (row) {
+                row.remove();
+            });
+
+            // Append the sorted rows to the table body
+            var tbody = document.querySelector("tbody");
+            rowsArray.forEach(function (row) {
+                tbody.appendChild(row);
+            });
+        }
+    });
+</script>

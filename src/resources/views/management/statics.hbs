@@ -1,0 +1,174 @@
+<div class="mt-4">
+    <h2>Thống kê các tour</h2>
+    <div class="mb-3">
+        <div class="row justify-content">
+            <div class="col-md-auto">
+                <label for="totalTour" class="form-label">Tổng số tour</label>
+                <input type="text" class="form-control" id="totalTour" value="{{totalTour}} TOUR" readonly>
+            </div>
+            <div class="col-md-auto">
+                <label for="totalQuantity" class="form-label">Tổng số lượt đặt</label>
+                <input type="text" class="form-control" id="totalQuantity" value="{{numberFormat totalQuantity}} lượt" readonly>
+            </div>
+            <div class="col-md-auto">
+                <label for="totalRevenue" class="form-label">Tổng doanh thu</label>
+                <input type="text" class="form-control" id="totalRevenue" value="{{numberFormat totalRevenue}} VNĐ" readonly>
+            </div>
+            <div class="col-md-10">
+            </div>
+            <br>
+            <div class="col-md-auto">
+                <label for="codeFilter" class="form-label">Mã tour</label>
+                <input type="text" class="form-control" id="codeFilter">
+            </div>
+            <div class="col-md-auto">
+                <label for="titleFilter" class="form-label">Tiêu đề</label>
+                <input type="text" class="form-control" id="titleFilter">
+            </div>
+            <div class="col-md-auto">
+                <label for="sortFilter" class="form-label">Sắp xếp theo</label>
+                <select class="form-select" id="sortFilter" onchange="sortTable()">
+                    <option value="default">Mặc định</option>
+                    <option value="price_asc">Giá tăng dần</option>
+                    <option value="price_desc">Giá giảm dần</option>
+                    <option value="quantity_asc">Số lượt đặt tăng dần</option>
+                    <option value="quantity_desc">Số lượt đặt giảm dần</option>
+                    <option value="revenue_asc">Doanh thu tăng dần</option>
+                    <option value="revenue_desc">Doanh thu giảm dần</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <table class="table mt-2">
+        <thead class="table-active">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Mã tour </th>
+                <th scope="col">Tiêu đề chuyến du lịch</th>
+                <th scope="col">Giá tiền tour (VNĐ/lượt)</th>
+                <th scope="col">Số lượng đặt (lượt)</th>
+                <th scope="col">Doanh thu (VNĐ)</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            {{#each data}}
+            <tr>
+                <th scope="row">{{sum @index 1}}</th>
+                <td>{{this.[0]}}</td>
+                <td>{{this.[2]}}</td>
+                {{#if (isZero this.[5])}}
+                <td>Hết chỗ</td>
+                {{else}}
+                <td>{{ numberFormat this.[5]}}</td>
+                {{/if}}
+                <td>{{this.[7]}}</td>
+                <td>{{numberFormat (mul this.[5] this.[7])}}</td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="9" class="text-center">
+                    You have nothing left!
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Get input and select elements
+        var codeFilter = document.getElementById("codeFilter");
+        var titleFilter = document.getElementById("titleFilter");
+        var sortFilter = document.getElementById("sortFilter");
+        // Get table rows
+        var rows = document.querySelectorAll("tbody tr");
+
+        // Add event listeners to input fields and select element
+        codeFilter.addEventListener("input", filterTable);
+        titleFilter.addEventListener("input", filterTable);
+        sortFilter.addEventListener("change", sortTable);
+
+        function filterTable() {
+            var codeValue = codeFilter.value.toLowerCase();
+            var titleValue = titleFilter.value.toLowerCase();
+
+            // Loop through each row and hide/show based on filter criteria
+            rows.forEach(function (row) {
+                var code = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+                var title = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+
+                var codeMatch = code.includes(codeValue);
+                var titleMatch = title.includes(titleValue);
+
+                if (codeMatch && titleMatch) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+        function sortTable() {
+            var sortBy = sortFilter.value;
+
+            // Convert rows to an array for sorting
+            var rowsArray = Array.from(rows);
+
+            if (sortBy.includes('price')) {
+                rowsArray.sort(function (a, b) {
+                    var aValue = parseFloat(a.querySelector(`td:nth-child(4)`).textContent);
+                    var bValue = parseFloat(b.querySelector(`td:nth-child(4)`).textContent);
+
+                    if (sortBy.includes('asc')) {
+                        return aValue - bValue;
+                    } else if (sortBy.includes('desc')) {
+                        return bValue - aValue;
+                    }
+                });
+            }
+
+            else if (sortBy.includes('revenue')) {
+                rowsArray.sort(function (a, b) {
+                    var aValue = parseFloat(a.querySelector(`td:nth-child(6)`).textContent);
+                    var bValue = parseFloat(b.querySelector(`td:nth-child(6)`).textContent);
+
+                    if (sortBy.includes('asc')) {
+                        return aValue - bValue;
+                    } else if (sortBy.includes('desc')) {
+                        return bValue - aValue;
+                    }
+                });
+            }
+            else if (sortBy.includes('quantity')) {
+                rowsArray.sort(function (a, b) {
+                    var aValue = parseFloat(a.querySelector(`td:nth-child(5)`).textContent);
+                    var bValue = parseFloat(b.querySelector(`td:nth-child(5)`).textContent);
+
+                    if (sortBy.includes('asc')) {
+                        return aValue - bValue;
+                    } else if (sortBy.includes('desc')) {
+                        return bValue - aValue;
+                    }
+                });
+            }
+            else if (sortBy == 'default') {
+                rowsArray.sort(function (a, b) {
+                return 0;
+            });
+            }
+
+            // Clear the table body
+            rows.forEach(function (row) {
+                row.remove();
+            });
+
+            // Append the sorted rows to the table body
+            var tbody = document.querySelector("tbody");
+            rowsArray.forEach(function (row) {
+                tbody.appendChild(row);
+            });
+        }
+    });
+</script>

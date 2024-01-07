@@ -1,0 +1,75 @@
+<div class="mt-4">
+    <h3>Nhập thông tin chuyến du lịch</h3>
+    <br>
+    <form action="/management/store" method="POST" id="createForm">
+        <div class="mb-3">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="newCode" class="form-label">Mã chuyến du lịch</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">#</span>
+                        <input type="text" class="form-control" placeholder="CODE" aria-describedby="basic-addon1"
+                            name="newCode" id="newCode" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="newCountry" class="form-label">Quốc gia</label>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" aria-describedby="basic-addon2"
+                            placeholder="VD: Việt Nam" name="newCountry" id="newCountry" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label for="newURL" class="form-label">URL ảnh</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="basic-addon3">https:</span>
+                        <input type="text" class="form-control" id="newURL" aria-describedby="basic-addon3 basic-addon4"
+                            name="newURL" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="newPrice" class="form-label">Giá chuyến đi</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="newPrice" id="newPrice" required>
+                        <span class="input-group-text">x1,000,000 VND</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="newTime" class="form-label">Thời lượng chuyến đi</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Thời lượng" name="newTime" id="newTime"
+                            required>
+                        <span class="input-group-text">Ngày</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="newRating" class="form-label">Điểm đánh giá</label>
+                    <input type="text" class="form-control" placeholder="Trong khoảng từ 1.0 tới 10" name="newRating"
+                        id="newRating" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <label for="newTitle" class="form-label">Nội dung chuyến du lịch</label>
+            <div class="input-group">
+                <textarea class="form-control" aria-label="With textarea" placeholder="Viết miêu tả tại đây"
+                    name="newTitle" id="newTitle"></textarea>
+            </div>
+        </div>
+        <br>
+        <div class="mb-3">
+            <label for="newVehicle" class="form-label">Phương tiện di chuyển</label>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="VD: Di chuyển bằng ô tô - Di chuyển bằng máy bay"
+                    name="newVehicle" id="newVehicle">
+            </div>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Xác nhận</button>
+    </form>
+</div>

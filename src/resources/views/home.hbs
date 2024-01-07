@@ -1,7 +1,7 @@
 <div class="mt-4">
     <div class="mb-3">
         <div class="row justify-content-center">
-            
+
             <div class="col-md-auto">
                 <select class="form-select" id="priceSort" onchange="sortItems()">
                     <option value="default">Sắp xếp theo</option>
@@ -44,7 +44,8 @@
     </div>
     <div class="row del">
         {{#each data}}
-        <div class="col-sm-6 col-lg-3" data-title="{{this.[1]}}" data-vehicle="{{this.[6]}}" data-price="{{this.[5]}}">
+        <div class="col-sm-6 col-lg-3" data-title="{{this.[1]}}" data-vehicle="{{this.[6]}}" data-price="{{this.[5]}}"
+            data-code="{{this.[0]}}">
             <div class="card card-tour-item" style="width: 18rem">
                 <img class="card-img-top" src='{{this.[3]}}' alt="Card image cap">
                 <div class="card-body">
@@ -52,7 +53,7 @@
                     <p class="Tour-name">{{this.[2]}}</p>
                     <span class="score-container__inner v-margin-top-5">
                         <script>
-                            var value = {{ this.[7]}};
+                            var value = {{ this.[8]}};
                             var formattedValue = Number.isInteger(value) ? value + ".0" : value;
                             document.write('<span class="score">' + formattedValue + '</span>');
                         </script>
@@ -66,12 +67,13 @@
                             <li class="card-vehicle">{{this.[6]}}</li>
                         </ul>
                     </div>
-                    <script>
-                        var originalPrice = {{ this.[5] }};
-                        var formattedPrice = new Intl.NumberFormat('vi-VN').format(originalPrice);
-                        document.write('<span class="price">' + formattedPrice + '<small class="textCurrency"> VND</small></span>');
-                    </script>
-                    <button class="btn btn-primary" onclick="showBookingModal()">Đặt tour</button>
+                    {{#if (isZero this.[5])}}
+                    <span class="price">Hết chỗ<small class="textCurrency"></small>
+                        {{else}}
+                        <span class="price">{{numberFormat this.[5]}}<small class="textCurrency"> VND</small></span>
+                        {{/if}}
+                        <button class="btn btn-primary" onclick="showBookingModal('{{this.[0]}}', '{{this.[5]}}')">Đặt
+                            tour</button>
                 </div>
             </div>
         </div>
@@ -83,14 +85,46 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">XÁC NHẬN</h5>
+                <h5 class="modal-title">HOÀN TẤT THÔNG TIN</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Bạn muốn đặt chuyến du lịch này?</p>
+                <form id="bookingForm" action="/booking" method="GET">
+                    <input class="form-control" type="text" name="code" hidden>
+                    <div class="mb-3">
+                        <input class="form-control" type="text" name="id" placeholder="Số căn cước công dân">
+                    </div>
+                    <div class="mb-3">
+                        <input class="form-control" type="text" name="name" placeholder="Họ và tên">
+                    </div>
+                    <div class="mb-3">
+                        <input class="form-control" type="text" name="phone" placeholder="Số điện thoại">
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="totalAmount">Giá (VNĐ/người):</label>
+                            <input class="form-control text-center" type="text" name="price" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="quantity">Số lượng người:</label>
+                            <div class="input-group">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    onclick="decreaseQuantity()">–</button>
+                                <input class="form-control text-center" type="text" id="quantity" name="quantity"
+                                    value="1">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    onclick="increaseQuantity()">+</button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="totalAmount">Tổng số tiền (VNĐ):</label>
+                            <input class="form-control text-center" type="text" name="totalAmount" readonly>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
-                <button id="btn-book" type="button" class="btn btn-danger" data-bs-dismiss="modal">Đồng ý</button>
+                <button id="btn-book" type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="submitBook()">Xác nhận</button>
                 <button type="button" class="btn btn-secondary" id="btn-cancel" data-bs-dismiss="modal">Huỷ</button>
             </div>
         </div>
@@ -148,7 +182,7 @@
             </div>
             <div class="modal-footer">
                 <button id="btn-hint" type="button" class="btn btn-danger" data-bs-dismiss="modal"
-                    onclick="submit()">Xác nhận</button>
+                    onclick="submitHint()">Xác nhận</button>
                 <button type="button" class="btn btn-secondary" id="btn-cancel" data-bs-dismiss="modal">Huỷ</button>
             </div>
         </div>
@@ -156,14 +190,57 @@
 </div>
 
 <script>
+    function submitHint() {
+        var form = document.getElementById("hintForm");
+        form.submit();
+    }
+
+    function submitBook() {
+        var form = document.getElementById("bookingForm");
+        form.submit();
+    }
+
+    var quantityInput = document.getElementById('quantity');
+
+    function increaseQuantity() {
+        var currentQuantity = parseInt(quantityInput.value);
+        quantityInput.value = currentQuantity + 1;
+        updateTotalAmount();
+    }
+
+    function decreaseQuantity() {
+        var currentQuantity = parseInt(quantityInput.value);
+        if (currentQuantity > 1) {
+            quantityInput.value = currentQuantity - 1;
+        }
+        updateTotalAmount();
+    }
+    function updateTotalAmount() {
+        var price = parseFloat(document.querySelector('input[name="price"]').value);
+        var quantity = parseInt(quantityInput.value);
+        var totalAmount = price * quantity * 1000000;
+
+        document.querySelector('input[name="totalAmount"]').value = formatNumber(totalAmount);
+    }
+
+    function formatNumber(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
 
     function hintModal() {
         var hintModal = new bootstrap.Modal(document.getElementById('hint'));
         hintModal.show();
     }
 
-    function showBookingModal() {
+    function showBookingModal(code, price) {
         var bookingModal = new bootstrap.Modal(document.getElementById('booking'));
+        var codeInput = document.querySelector('input[name="code"]');
+        var priceInput = document.querySelector('input[name="price"]');
+        var totalAmountInput = document.querySelector('input[name="totalAmount"]');
+
+        codeInput.value = code;
+        priceInput.value = formatNumber(price);
+        totalAmountInput.value = formatNumber(parseFloat(price) * parseFloat(quantityInput.value));
         bookingModal.show();
     }
 
@@ -188,10 +265,6 @@
                 item.style.display = 'none';
             }
         });
-    }
-    function submit() {
-        var form = document.getElementById("hintForm");
-        form.submit();
     }
     document.addEventListener('DOMContentLoaded', function () {
         var rangeSlider = document.getElementById('rangeSlider');

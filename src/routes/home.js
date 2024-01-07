@@ -7,5 +7,5 @@ const homeController = require('../controllers/HomeController');
 router.get('/search', homeController.getTourBySearch);
 router.get('/hint', homeController.getHint);
 router.get('/', homeController.getAllTour);
-router.get('/management', homeController.createTour);
+router.get('/booking', homeController.booking);
 module.exports = router;

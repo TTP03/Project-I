@@ -1,0 +1,142 @@
+<div class="mt-4">
+    <h3>Nhập thông tin chuyến du lịch</h3>
+    <br>
+    <a href="/management/show"><i class="bi bi-arrow-left-circle"></i> Quay lại</a>
+    <form action="/management/{{tour.[0]}}?_method=PUT" method="POST">
+        <div class="mb-3">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="newCode" class="form-label">Mã chuyến du lịch</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">#</span>
+                        <input type="text" class="form-control" placeholder="CODE" aria-describedby="basic-addon1"
+                            name="newCode" id="newCode" value="{{tour.[0]}}" readonly>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="newCountry" class="form-label">Quốc gia</label>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" aria-describedby="basic-addon2"
+                            placeholder="VD: Việt Nam" name="newCountry" id="newCountry" value="{{tour.[1]}}" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label for="newURL" class="form-label">URL ảnh</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="basic-addon3">https:</span>
+                        <input type="text" class="form-control" id="newURL" aria-describedby="basic-addon3 basic-addon4"
+                            name="newURL" value="{{tour.[3]}}" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="newPrice" class="form-label">Giá chuyến đi</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="newPrice" id="newPrice" value="{{ division tour.[5] 1000000}}" required>
+                        <span class="input-group-text">x1,000,000 VND</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="newTime" class="form-label">Thời lượng chuyến đi</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Thời lượng" name="newTime" id="newTime" value="{{tour.[4]}}"
+                            required>
+                        <span class="input-group-text">Ngày</span>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label for="newRating" class="form-label">Điểm đánh giá</label>
+                    <input type="text" class="form-control" placeholder="Trong khoảng từ 1.0 tới 10" name="newRating"
+                        id="newRating" value="{{tour.[8]}}" required>
+                </div>
+                <div class="col-md-2">
+                    <label for="newRating" class="form-label">Số lượt đặt</label>
+                    <input type="text" class="form-control"  name="newRating"
+                        id="newRating" value="{{tour.[7]}} lượt" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <label for="newTitle" class="form-label">Nội dung chuyến du lịch</label>
+            <div class="input-group">
+                <input class="form-control" aria-label="With textarea" placeholder="Viết miêu tả tại đây"
+                    name="newTitle" id="newTitle" value="{{tour.[2]}}"></input>
+            </div>
+        </div>
+        <br>
+        <div class="mb-3">
+            <label for="newVehicle" class="form-label">Phương tiện di chuyển</label>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="VD: Di chuyển bằng ô tô - Di chuyển bằng máy bay"
+                    name="newVehicle" id="newVehicle" value="{{tour.[6]}}">
+            </div>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Xác nhận</button>
+        <a class="btn btn-danger" data-bs-toggle="modal" data-id="{{tour.[0]}}"
+                        data-bs-target="#delete-tour">Xoá</a>
+    </form>
+</div>
+<div class="modal fade" id="delete-tour" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">CẢNH BÁO</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn muốn xoá tour này?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-delete-tour" type="button" class="btn btn-danger">Vẫn Xoá</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleted" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">THÔNG BÁO</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn đã xóa du lịch thành công!</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-ok" type="button" class="btn btn-danger" data-bs-dismiss="modal" ><a class="btn"style="color: #ffff " href="/management/show">Đóng</a></button>
+            </div>
+        </div>
+    </div>
+</div>
+<form name="delete-tour-form" method="POST"></form>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var modelComfirmDelete = document.getElementById('delete-tour')
+        var btnComfirmDelete = document.getElementById('btn-delete-tour')
+        var deleteForm = document.forms['delete-tour-form']
+        var code
+
+        // xử lý nút xoá
+        modelComfirmDelete.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget
+            code = button.getAttribute('data-id')
+        })
+
+        btnComfirmDelete.onclick = function () {
+            {{!-- alert(code) --}}
+            deleteForm.action = '/management/' + code + '/permanent?_method=DELETE'
+            deleteForm.submit()
+        }
+        
+    });
+    document.getElementById('btn-delete-tour').addEventListener('click', function () {
+        var bookedModal = new bootstrap.Modal(document.getElementById('deleted'));
+        bookedModal.show();
+    });
+    </script>

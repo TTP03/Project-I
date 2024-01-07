@@ -22,6 +22,12 @@ h1 {
   float: right;
   color: #f79321;
 }
+.price-management {
+  font-size: 22px;
+  font-weight: bold;
+  float: left;
+  color: #f79321;
+}
 .score-container__inner {
   float: left;
   margin-bottom: 10px;
