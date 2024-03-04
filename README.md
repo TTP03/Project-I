@@ -1,3 +1,5 @@
-1. npm install
-2. npm start
-3. http://localhost:3000
+TOUR-BOOKING-WEBSITE
+1. Download nodejs
+2. npm install
+3. npm start
+4. http://localhost:3000
